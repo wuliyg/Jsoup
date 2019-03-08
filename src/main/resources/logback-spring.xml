@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!-- 获取项目名称 -->
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <!-- 日志存放路径 -->
+    <property name="LOG_FILE" value="jsoupLogs/"/>
+
+    <!-- 日志输出格式 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([${springAppName:-}]){yellow} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <!--配置console打印的log-->
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- 日志输出开始级别 -->
+            <level>DEBUG</level>
+        </filter>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <!--自定义配置info日志存放-->
+    <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--设置文件保存路径，timeBasedFileNamingAndTriggeringPolicy标签时，这里的%i要加上，不然会导致运行报错-->
+            <fileNamePattern>${LOG_FILE}info_%d-%i.log</fileNamePattern>
+            <!-- 配置日志文件不能超过10M，若超过10M，日志文件会以索引0开始，命名日志文件，例如info.2018-12-21-0.log -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!--日志文件保留天数-->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!--滚动策略，按天输出日志-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--设置文件保存路径，timeBasedFileNamingAndTriggeringPolicy标签时，这里的%i要加上，不然会导致运行报错-->
+            <fileNamePattern>${LOG_FILE}error_%d-%i.log</fileNamePattern>
+            <!-- 配置日志文件不能超过10M，若超过10M，日志文件会以索引0开始，命名日志文件，例如error.2018-12-21-0.log -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+    </appender>
+    <!--过滤掉spring和mybatis的一些无用的debug信息-->
+    <logger name="org.springframework" level="INFO">
+    </logger>
+    <logger name="org.mybatis" level="INFO">
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="consoleLog"/>
+        <appender-ref ref="fileInfoLog"/>
+        <appender-ref ref="fileErrorLog"/>
+    </root>
+</configuration>

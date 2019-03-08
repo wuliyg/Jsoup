@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wulis.jsoup.content.dao.ContentMapper">
+    <resultMap id="BaseResultMap" type="com.wulis.jsoup.content.model.dto.Content">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="input_time" property="inputTime" jdbcType="VARCHAR"/>
+        <result column="cata_id" property="cataId" jdbcType="INTEGER"/>
+        <result column="eng_word" property="engWord" jdbcType="VARCHAR"/>
+        <result column="translate" property="translate" jdbcType="LONGVARCHAR"/>
+        <result column="english_voice_url" property="englishVoiceUrl" jdbcType="VARCHAR"/>
+        <result column="chinese_voice_url" property="chineseVoiceUrl" jdbcType="VARCHAR"/>
+        <result column="operator_by" property="operatorBy" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, input_time, cata_id, eng_word, translate,english_voice_url, chinese_voice_url,operator_by
+  </sql>
+
+    <!-- 插入单词信息 -->
+    <insert id="insertShanbayContent" parameterType="List">
+        insert into wulis_content (input_time, cata_id,
+        eng_word, translate, operator_by
+        )
+        values
+        <foreach collection="list" separator="," index="index" item="item">
+            (#{item.inputTime,jdbcType=VARCHAR}, #{item.cataId,jdbcType=INTEGER},
+            #{item.engWord,jdbcType=VARCHAR}, #{item.translate,jdbcType=VARCHAR},
+            #{item.operatorBy,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 查询没有音频的单词 -->
+    <select id="queryByNoneEnglishOrChineseVoice" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wulis_content
+        WHERE english_voice_url is NULL OR chinese_voice_url is NULL
+    </select>
+    <!-- 更新中文英文语音地址 -->
+    <update id="updateEnglishAndChineseVoiceUrl" parameterType="com.wulis.jsoup.content.model.dto.Content">
+        UPDATE wulis_content
+        SET
+        <if test="englishVoiceUrl!='' and englishVoiceUrl !=null">
+            english_voice_url=#{englishVoiceUrl,jdbcType=VARCHAR}
+        </if>
+        <if test="chineseVoiceUrl!='' and chineseVoiceUrl !=null and englishVoiceUrl!='' and englishVoiceUrl !=null">
+            ,
+        </if>
+        <if test="chineseVoiceUrl!='' and chineseVoiceUrl !=null">
+            chinese_voice_url=#{chineseVoiceUrl,jdbcType=VARCHAR}
+        </if>
+        WHERE id=#{id}
+    </update>
+    <!-- 根据章节查询单词列表 -->
+    <select id="queryShanbayEnglishTablePage" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wulis_content
+        <if test="title!='' and title !=null">
+            WHERE cata_id=#{title}
+        </if>
+        ORDER BY eng_word ASC
+    </select>
+</mapper>

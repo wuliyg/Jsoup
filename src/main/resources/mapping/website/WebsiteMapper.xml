@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wulis.jsoup.website.dao.WebsiteMapper">
+    <resultMap id="BaseResultMap" type="com.wulis.jsoup.website.model.Website">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="input_time" property="inputTime" jdbcType="VARCHAR"/>
+        <result column="website" property="website" jdbcType="VARCHAR"/>
+        <result column="agreement" property="agreement" jdbcType="VARCHAR"/>
+        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <result column="operator_by" property="operatorBy" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, input_time, website, agreement, `describe`, operator_by
+  </sql>
+    <!-- 查询扇贝网站信息 -->
+    <select id="selectShanbayWebsite" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wulis_website
+        where `describe`='扇贝'
+    </select>
+</mapper>

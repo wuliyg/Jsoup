@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="footer-js">
+    <script th:src="@{~/common/jquery/jquery-3.2.1.min.js}" type="text/javascript"></script>
+    <script th:src="@{~/common/layui/layui.js}" type="text/javascript"></script>
+    <script th:src="@{~/common/layer/layer.js}" type="text/javascript"></script>
+    <input id="basePath" type="hidden" th:value="${basePath}"/>
+    <script>
+        var basePath = $("#basePath").val();
+    </script>
+</footer>
+</body>
+</html>
